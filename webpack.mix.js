@@ -1,4 +1,4 @@
-const mix = require('laravel-mix');
+const compiler = require('laravel-mix');
 
 /*
  |--------------------------------------------------------------------------
@@ -11,6 +11,26 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.js('resources/js/app.js', 'public/js')
-    .sass('resources/sass/app.scss', 'public/css')
-    .sourceMaps();
+// Конфигурация "Webpack"
+compiler
+    .version()
+    .options({
+
+        // Отключение генерации файла "*.js.LICENSE.txt"
+        terser: {
+            extractComments: false,
+        },
+
+        // Перенос ресурсов из папки "node_modules"
+        processCssUrls: true,
+        fileLoaderDirs: {
+            fonts: 'assets/fonts',
+            images: 'assets/media'
+        }
+    });
+
+// Компиляция ресурсов
+compiler
+    .js('resources/assets/scripts/app.js', 'public/assets/scripts')
+    .sass('resources/assets/styles/app.scss', 'public/assets/styles')
+    .copy('resources/assets/media', 'public/assets/media');
