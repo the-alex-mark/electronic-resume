@@ -24,6 +24,11 @@
         "phpunit/phpunit": "^9.5.10"
     },
     "autoload": {
+        "files": [
+            "helpers/blade.php",
+            "helpers/email.php",
+            "helpers/phone.php"
+        ],
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
