@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Database\Eloquent\Concerns\HasCustom;
+use App\Database\Eloquent\Concerns\HasValidation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,7 @@ class Education extends Model {
 
     use HasFactory;
     use HasCustom;
+    use HasValidation;
 
     #region Properties
 
@@ -81,6 +83,34 @@ class Education extends Model {
      */
     public function getSpecializationAttribute($value) {
         return (is_null($value)) ? '' : (string)$value;
+    }
+
+    #endregion
+
+    #region Validation
+
+    /**
+     * @inheritDoc
+     */
+    protected static function validatorRules() {
+        return [
+            'institution'    => [ 'bail', 'required', 'string' ],
+            'faculty'        => [ 'bail', 'nullable', 'string' ],
+            'specialization' => [ 'bail', 'nullable', 'string' ],
+            'year'           => [ 'bail', 'required', 'string' ]
+        ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected static function validatorAttributes() {
+        return [
+            'institution'    => '',
+            'faculty'        => '',
+            'specialization' => '',
+            'year'           => '',
+        ];
     }
 
     #endregion

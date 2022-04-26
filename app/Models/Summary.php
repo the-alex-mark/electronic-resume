@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Database\Eloquent\Concerns\HasCustom;
+use App\Database\Eloquent\Concerns\HasValidation;
 use App\Rules\PhoneFormatRule;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -41,6 +42,7 @@ class Summary extends Model {
 
     use HasFactory;
     use HasCustom;
+    use HasValidation;
 
     #region Properties
 
@@ -165,6 +167,51 @@ class Summary extends Model {
      */
     public function getAboutAttribute($value) {
         return (is_null($value)) ? '' : (string)$value;
+    }
+
+    #endregion
+
+    #region Validation
+
+    /**
+     * @inheritDoc
+     */
+    protected static function validatorRules() {
+        return [
+            'position_id' => [ 'bail', 'required', 'integer', 'min:0', 'exists:positions,id' ],
+            'first_name' => [ 'bail', 'required', 'string' ],
+            'last_name' => [ 'bail', 'required', 'string' ],
+            'patronymic' => [ 'bail', 'nullable', 'string' ],
+            'date_of_birth' => [ 'bail', 'required', 'date' ],
+            'city' => [ 'bail', 'required', 'string' ],
+            'floor' => [ 'bail', 'required', 'string', 'in:male,women' ],
+            'phone' => [ 'bail', 'required', 'string', new PhoneFormatRule() ],
+            'email' => [ 'bail', 'nullable', 'email:rfc,dns' ],
+            'site' => [ 'bail', 'nullable', 'url' ],
+            'about' => [ 'bail', 'nullable', 'string' ],
+            'educations' => [ 'bail', 'required', 'array', 'min:0' ],
+            'experiences' => [ 'bail', 'nullable', 'array' ]
+        ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected static function validatorAttributes() {
+        return [
+            'position_id' => 'должность',
+            'first_name' => 'имя',
+            'last_name' => 'фамилия',
+            'patronymic' => 'отчество',
+            'city' => 'город',
+            'floor' => 'пол',
+            'phone' => 'мобильный телефон',
+            'email' => 'электронная почта',
+            'site' => 'личный сайт',
+            'about' => 'о себе',
+            'educations' => 'образование',
+            'experiences' => 'опыт работы'
+        ];
     }
 
     #endregion

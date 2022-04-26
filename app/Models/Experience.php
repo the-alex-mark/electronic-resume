@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Database\Eloquent\Concerns\HasCustom;
+use App\Database\Eloquent\Concerns\HasValidation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,6 +28,7 @@ class Experience extends Model {
 
     use HasFactory;
     use HasCustom;
+    use HasValidation;
 
     #region Properties
 
@@ -126,6 +128,38 @@ class Experience extends Model {
      */
     public function getSiteAttribute($value) {
         return (is_null($value)) ? '' : (string)$value;
+    }
+
+    #endregion
+
+    #region Validation
+
+    /**
+     * @inheritDoc
+     */
+    protected static function validatorRules() {
+        return [
+            'organization' => [ 'bail', 'required_with:experiences', 'string' ],
+            'start' => [ 'bail', 'required_with:experiences', 'date' ],
+            'end' => [ 'bail', 'nullable', 'date' ],
+            'position' => [ 'bail', 'required_with:experiences', 'string' ],
+            'description' => [ 'bail', 'required_with:experiences', 'string' ],
+            'site' => [ 'bail', 'nullable', 'url' ]
+        ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected static function validatorAttributes() {
+        return [
+            'organization' => 'организация',
+            'start' => 'начало работы',
+            'end' => 'окончание работы',
+            'position' => 'должность',
+            'description' => 'обязанности на рабочем месте',
+            'site' => 'адрес сайта'
+        ];
     }
 
     #endregion
