@@ -29,6 +29,16 @@ class ConfirmPasswordController extends Controller
     protected $redirectTo = RouteServiceProvider::HOME;
 
     /**
+     * Display the password confirmation view.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showConfirmForm()
+    {
+        return view('pages.auth.passwords.confirm');
+    }
+
+    /**
      * Create a new controller instance.
      *
      * @return void
