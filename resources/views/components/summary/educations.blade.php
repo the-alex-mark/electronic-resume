@@ -1,0 +1,17 @@
+<h4 class="mb-3">Образование</h4>
+<div id="educations" class="row mb-5 g-3 place-list" data-place-type="educations">
+    @forelse(old('educations', $educations ?? []) as $index => $education)
+        @include('components.education', array_merge([ 'index' => $index ], $education))
+    @empty
+        @include('components.education', [ 'index' => 0 ])
+    @endforelse
+
+    <div class="row justify-content-end mt-3">
+        <button
+            class="btn btn-primary btn-md w-auto place-add"
+            data-url="{{ route('summary.place', [ 'type' => 'education' ]) }}"
+        >
+            Указать ещё одно место обучения
+        </button>
+    </div>
+</div>
