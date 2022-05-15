@@ -2,33 +2,26 @@
 
 namespace App\Exceptions;
 
-use App\Helpers\ApiHelper;
-use Error;
-use Exception;
+use App\Providers\RouteServiceProvider;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler {
 
-    /**
-     * A list of the exception types that are not reported.
-     *
-     * @var array<int, class-string<Throwable>>
-     */
-    protected $dontReport = [
-        //
-    ];
+    #region Properties
 
     /**
-     * A list of the inputs that are never flashed for validation exceptions.
-     *
-     * @var array
+     * @inheritDoc
+     */
+    protected $dontReport = [];
+
+    /**
+     * @inheritDoc
      */
     protected $dontFlash = [
         'current_password',
@@ -36,10 +29,10 @@ class Handler extends ExceptionHandler {
         'password_confirmation',
     ];
 
+    #endregion
+
     /**
-     * Register the exception handling callbacks for the application.
-     *
-     * @return void
+     * @inheritDoc
      */
     public function register() {
 
@@ -48,10 +41,13 @@ class Handler extends ExceptionHandler {
             if ($request->wantsJson() || $request->expectsJson() || $request->ajax())
                 return response()->json([ 'result' => false, 'message' => 'Method not found' ], $e->getStatusCode());
 
+            if (Auth::check())
+                return redirect(RouteServiceProvider::HOME);
+
             return response()->view('pages.errors.404', [], $e->getStatusCode());
         });
 
-        // Обращение к несуществующему методу или странице
+        // Обращение к запрещённому методу или странице
         $this->renderable(function (AccessDeniedHttpException $e, $request) {
             if ($request->wantsJson() || $request->expectsJson() || $request->ajax())
                 return response()->json([ 'result' => false, 'message' => 'Forbidden' ], $e->getStatusCode());
@@ -59,10 +55,35 @@ class Handler extends ExceptionHandler {
             return response()->view('pages.errors.403', [], $e->getStatusCode());
         });
 
+        // Обращение к методу, требующий аутентификацию пользователя
+        $this->renderable(function (AuthenticationException $e, $request) {
+            if ($request->wantsJson() || $request->expectsJson() || $request->ajax())
+                return response()->json([ 'result' => false, 'message' => 'Unauthorized' ], 401);
+
+            return redirect()->route('login');
+        });
+
         // Внутренняя ошибка сервера
         $this->renderable(function (Throwable $e, $request) {
-            if ($request->wantsJson() || $request->expectsJson() || $request->ajax())
+            if (($e instanceof ValidationException))
+                return null;
+
+            if ($request->wantsJson() || $request->expectsJson() || $request->ajax()) {
+
+                // Подробное описание ошибки при включенном режиме отладке
+                if (config('app.debug', false) === true) {
+                    return response()->json([
+                        'result'  => false,
+                        'message' => $e->getMessage(),
+                        'code'    => $e->getCode(),
+                        'file'    => $e->getFile(),
+                        'line'    => $e->getLine(),
+                        'trace'   => $e->getTrace()
+                    ], 500);
+                }
+
                 return response()->json([ 'result' => false, 'message' => 'Internal Server Error' ], 500);
+            }
 
             if (config('app.debug', false) === false)
                 return response()->view('pages.errors.500', [], 500);
@@ -72,23 +93,29 @@ class Handler extends ExceptionHandler {
     }
 
     /**
-     * Render an exception into an HTTP response.
-     *
-     * @param  Request   $request
-     * @param  Throwable $e
-     * @return JsonResponse|Response|SymfonyResponse
-     * @throws Throwable
+     * @inheritDoc
      */
     public function render($request, Throwable $e) {
 
         // Техническое обслуживание
         if (app()->isDownForMaintenance()) {
             if ($request->wantsJson() || $request->expectsJson() || $request->ajax())
-                return response()->json([ 'result' => false, 'message' => $e->getMessage() ], 503);
+                return response()->json([ 'result' => false, 'message' => 'Service Unavailable' ], 503);
 
             return response()->view('pages.errors.503', [], 503);
         }
 
         return parent::render($request, $e);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function invalidJson($request, ValidationException $exception) {
+        return response()->json([
+            'result'  => false,
+            'message' => 'Unprocessable Content',
+            'errors'  => $exception->errors()
+        ], $exception->status);
     }
 }
