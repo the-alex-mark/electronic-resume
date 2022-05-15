@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PassageController;
 use App\Http\Controllers\SummaryController;
 use App\Http\Controllers\TestController;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +39,14 @@ Route::middleware([ 'auth' ])->group(function () {
 
             // Вспомогательные маршруты
             Route::post('place/{type}', [ SummaryController::class, 'place' ])->name('summary.place')->where([ 'type' => '(education)|(experience)' ]);
+        });
+
+        // Раздел "Прохождение теста"
+        Route::prefix('passage')->group(function () {
+
+            // Прохождение теста
+            Route::get('/', [ PassageController::class, 'create' ])->name('passage.create');
+            Route::post('/save', [ PassageController::class, 'save' ])->name('passage.save');
         });
     });
 

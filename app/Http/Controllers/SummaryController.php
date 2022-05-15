@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SummaryRequest;
+use App\Models\Result;
 use App\Models\Summary;
+use App\Models\Test;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
@@ -101,6 +103,21 @@ class SummaryController extends Controller {
             $model
                 ->experiences()
                 ->updateOrCreate([ 'id' => data_get($experience, 'id', -1) ], $experience);
+        }
+
+        // Назначение теста
+        if (empty($model->result)) {
+
+            /** @var Test $test */
+            $test = Test::query()
+                ->where('position_id', $model->position_id)
+                ->first();
+
+            $model->result()->save(new Result([
+                'questions' => $test->data
+            ]));
+
+            return redirect()->route('passage.create');
         }
 
         return response()->redirectToRoute('summary.edit', [ 'summary' => $model ]);

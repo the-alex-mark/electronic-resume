@@ -29,6 +29,13 @@ class Candidate {
                 if ($user->summaries->isEmpty())
                     return redirect()->route('summary.create');
             }
+
+//            // TODO: Доработать автоматическое перенаправление на страницу прохождения теста
+//            // Перенаправление на страницу тестирования
+//            if (!$request->is('passage/*')) {
+//                if ($user->summaries()->whereHas('result')->get()->isEmpty())
+//                    return redirect()->route('passage.create');
+//            }
         }
 
         return $next($request);
