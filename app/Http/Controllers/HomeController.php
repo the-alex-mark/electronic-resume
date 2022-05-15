@@ -3,26 +3,34 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
-class HomeController extends Controller
-{
+class HomeController extends Controller {
+
     /**
-     * Create a new controller instance.
-     *
-     * @return void
+     * @inheritDoc
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->middleware('auth');
     }
 
     /**
-     * Show the application dashboard.
+     * Обрабатывает маршрут главной страницы сервиса.
      *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * @param  Request $request Параметры запроса
+     * @return View
      */
-    public function index()
-    {
-        return view('pages.home');
+    public function index(Request $request) {
+        $summaries = $request->user()
+            ->summaries()
+            ->with('result')
+            ->when($request->get('all', false) == false, function ($query) {
+                $query->limit(1);
+            })
+            ->get();
+
+        return view('pages.home', [
+            'summaries' => $summaries
+        ]);
     }
 }

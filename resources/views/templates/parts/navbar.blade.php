@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm mb-4">
+<nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
     <div class="container">
 
         {{-- Заголовок сайта --}}
@@ -37,9 +37,12 @@
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item"
-                               href="{{ route('logout') }}"
-                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                            <a class="dropdown-item" href="{{ route('home') }}">{{ __('Консоль') }}</a>
+                            <a
+                                id="logout-link"
+                                class="dropdown-item"
+                                href="{{ route('logout') }}"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                             >
                                 {{ __('Выйти') }}
                             </a>
