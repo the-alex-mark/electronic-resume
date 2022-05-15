@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\Candidate;
+use App\Http\Middleware\Checking;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -69,5 +70,6 @@ class Kernel extends HttpKernel
          * Custom
          */
         'candidate' => Candidate::class,
+        'checking' => Checking::class,
     ];
 }

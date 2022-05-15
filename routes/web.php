@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SummaryController;
+use App\Http\Controllers\TestController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -37,6 +38,23 @@ Route::middleware([ 'auth' ])->group(function () {
 
             // Вспомогательные маршруты
             Route::post('place/{type}', [ SummaryController::class, 'place' ])->name('summary.place')->where([ 'type' => '(education)|(experience)' ]);
+        });
+    });
+
+    Route::middleware([ 'checking' ])->group(function () {
+
+        // Раздел "Тест"
+        Route::prefix('test')->group(function () {
+            Route::get('{test}', [ TestController::class, 'create' ])->name('test.show');
+            Route::get('edit', [ TestController::class, 'create' ])->name('test.create');
+            Route::get('{test}/edit', [ TestController::class, 'edit' ])->name('test.edit');
+            Route::any('{test}/export', [ TestController::class, 'export' ])->name('test.export');
+            Route::any('{test}/delete', [ TestController::class, 'delete' ])->name('test.delete');
+            Route::post('save', [ TestController::class, 'save' ])->name('test.save');
+
+            // Вспомогательные маршруты
+            Route::post('question', [ TestController::class, 'question' ])->name('test.question');
+            Route::post('answer', [ TestController::class, 'answer' ])->name('test.answer');
         });
     });
 });
