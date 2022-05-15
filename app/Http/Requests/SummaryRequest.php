@@ -19,9 +19,7 @@ class SummaryRequest extends FormRequest {
     #endregion
 
     /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function authorize() {
         return true;

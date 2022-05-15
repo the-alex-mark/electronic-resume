@@ -3,15 +3,19 @@
     @forelse(old('experiences', $experiences ?? []) as $index => $experience)
         @include('components.experience', array_merge([ 'index' => $index ], $experience))
     @empty
-        @include('components.experience', [ 'index' => 0 ])
+        @if(!isset($id))
+            @include('components.experience', [ 'index' => 0 ])
+        @endif
     @endforelse
 
-    <div class="row justify-content-end mt-3">
-        <button
-            class="btn btn-primary btn-md w-auto place-add"
-            data-url="{{ route('summary.place', [ 'type' => 'experience' ]) }}"
-        >
-            Указать ещё одно место работы
-        </button>
-    </div>
+    @if(!isset($readonly) || $readonly !== true)
+        <div class="row justify-content-end mt-3">
+            <button
+                class="btn btn-primary btn-md w-auto place-add"
+                data-url="{{ route('summary.place', [ 'type' => 'experience' ]) }}"
+            >
+                Указать ещё одно место работы
+            </button>
+        </div>
+    @endif
 </div>

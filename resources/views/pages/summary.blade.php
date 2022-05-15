@@ -4,26 +4,30 @@
 @section('page')
     <div class="container">
         <div class="row g-5">
-            <div class="col-lg-9">
+            <div class="col">
                 <form id="summary" method="POST" action="{{ route('summary.save') }}">
                     @csrf
 
-                    @include('components.summary.common')
-                    @include('components.summary.contacts')
-                    @include('components.summary.specialization')
-                    @include('components.summary.educations')
-                    @include('components.summary.experiences')
-                    @include('components.summary.about')
+                    <fieldset @disabled(isset($readonly) && $readonly === true)>
+                        @include('components.summary.common')
+                        @include('components.summary.contacts')
+                        @include('components.summary.specialization')
+                        @include('components.summary.educations')
+                        @include('components.summary.experiences')
+                        @include('components.summary.about')
+                    </fieldset>
 
                     {{-- Идентификатор записи --}}
                     @isset($id)
                         <input type="hidden" name="id" value="{{ $id }}">
                     @endisset
 
-                    <hr class="mt-5 mb-4">
-                    <button type="submit" class="w-100 btn btn-primary btn-lg">
-                        Сохранить анкету
-                    </button>
+                    @if(!isset($readonly) || $readonly !== true)
+                        <hr class="mt-5 mb-4">
+                        <button type="submit" class="w-100 btn btn-primary btn-lg">
+                            Сохранить анкету
+                        </button>
+                    @endif
                 </form>
             </div>
         </div>
@@ -61,8 +65,9 @@
 
                     let _list   = $(this).parents('.place-list').find('.place');
                     let _parent = $(this).parents('.place');
+                    let _type   = _parent.data('place-type');
 
-                    if (_list.length > 1)
+                    if (_list.length > 1 || _type === 'experience')
                         _parent.remove();
                 })
 

@@ -11,8 +11,25 @@ use Illuminate\Http\Request;
 
 class SummaryController extends Controller {
 
+    #region Helpers (AJAX)
+
     /**
-     * ...
+     * Возвращает шаблон "Место ..." (Образование, Опыт работы).
+     *
+     * @param  Request $request Параметры запроса.
+     * @param  int $type Идентификатор записи резюме.
+     * @return View
+     */
+    public function place(Request $request, $type = null) {
+        return view("components.$type", [
+            'index' => $request->get('index')
+        ]);
+    }
+
+    #endregion
+
+    /**
+     * Обрабатывает маршрут создания анкеты.
      *
      * @param  Request $request Параметры запроса.
      * @return View|RedirectResponse
@@ -29,41 +46,47 @@ class SummaryController extends Controller {
     }
 
     /**
-     * ...
+     * Обрабатывает маршрут редактирования анкеты.
      *
      * @param  Request $request Параметры запроса.
      * @param  Summary $summary Анкета.
      * @return View
      */
     public function edit(Request $request, Summary $summary) {
-        $summary = Summary::query()
-            ->with('educations', 'experiences')
-            ->find($summary->id);
+
+        // "Жадная" загрузка зависимостей
+        $summary->load('educations', 'experiences');
 
         return view('pages.summary', $summary->toArray());
     }
 
     /**
-     * ...
+     * Обрабатывает маршрут просмотра анкеты.
      *
      * @param  Request $request Параметры запроса.
-     * @param  int $type Идентификатор записи резюме.
+     * @param  Summary $summary Анкета.
      * @return View
      */
-    public function place(Request $request, $type = null) {
-        return view("components.$type", [ 'index' => $request->get('index') ]);
+    public function read(Request $request, Summary $summary) {
+
+        // "Жадная" загрузка зависимостей
+        $summary->load('educations', 'experiences');
+
+        return view('pages.summary', array_merge($summary->toArray(), [
+            'readonly' => true
+        ]));
     }
 
     /**
-     * ...
+     * Обрабатывает маршрут сохранения анкеты.
      *
      * @param  SummaryRequest $request Параметры запроса.
      * @return RedirectResponse
      */
     public function save(SummaryRequest $request) {
         $summary     = $request->except([ 'educations', 'experiences' ]);
-        $educations  = $request->get('educations');
-        $experiences = $request->get('experiences');
+        $educations  = $request->get('educations', []);
+        $experiences = $request->get('experiences', []);
 
         /** @var Summary $model */
         $model = Summary::query()->updateOrCreate([ 'id' => data_get($summary, 'id', -1) ], $summary);

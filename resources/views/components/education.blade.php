@@ -1,4 +1,4 @@
-<div class="row g-3 bg-light pb-3 border {{--border-light--}} rounded place" data-place-index="{{ $index }}">
+<div class="row g-3 bg-light pb-3 border {{--border-light--}} rounded place" data-place-index="{{ $index }}" data-place-type="education">
     <div class="col-sm-9">
         <label for="educations[{{ $index }}][institution]" class="form-label">Учебное заведение <sup class="text-danger">*</sup></label>
         <input
@@ -67,15 +67,17 @@
         @enderror
     </div>
 
-    <div class="col">
-        <hr class="mt-4">
-        <div class="row">
-            <div class="col d-flex justify-content-end">
-                <button class="btn btn-outline-danger btn-md ms-2 btn-place-clear">Очистить</button>
-                <button class="btn btn-danger btn-md ms-2 btn-place-remove">Удалить</button>
+    @if(!isset($readonly) || $readonly !== true)
+        <div class="col">
+            <hr class="mt-4">
+            <div class="row">
+                <div class="col d-flex justify-content-end">
+                    <button class="btn btn-outline-danger btn-md ms-2 btn-place-clear">Очистить</button>
+                    <button class="btn btn-danger btn-md ms-2 btn-place-remove">Удалить</button>
+                </div>
             </div>
         </div>
-    </div>
+    @endif
 
     {{-- Идентификатор записи --}}
     @isset($id)

@@ -52,7 +52,7 @@
         </select>
 
         @error('city')
-        <span class="invalid-feedback">{{ $message }}</span>
+            <span class="invalid-feedback">{{ $message }}</span>
         @enderror
     </div>
 

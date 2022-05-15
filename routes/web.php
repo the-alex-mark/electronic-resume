@@ -26,12 +26,17 @@ Route::middleware([ 'auth' ])->group(function () {
 
     Route::middleware([ 'candidate' ])->group(function () {
         Route::get('home', [ HomeController::class, 'index' ])->name('home');
-    });
 
-    Route::prefix('summary')->group(function () {
-        Route::get('edit', [ SummaryController::class, 'create' ])->name('summary.create');
-        Route::get('edit/{summary}', [ SummaryController::class, 'edit' ])->name('summary.edit');
-        Route::post('save', [ SummaryController::class, 'save' ])->name('summary.save');
-        Route::post('place/{type}', [ SummaryController::class, 'place' ])->name('summary.place')->where([ 'type' => '(education)|(experience)' ]);
+        // Раздел "Анкета"
+        Route::prefix('summary')->group(function () {
+            Route::get('{summary}', [ SummaryController::class, 'create' ])->name('summary.show');
+            Route::get('edit', [ SummaryController::class, 'create' ])->name('summary.create');
+            Route::get('{summary}/read', [ SummaryController::class, 'read' ])->name('summary.read');
+            Route::get('{summary}/edit', [ SummaryController::class, 'edit' ])->name('summary.edit');
+            Route::post('save', [ SummaryController::class, 'save' ])->name('summary.save');
+
+            // Вспомогательные маршруты
+            Route::post('place/{type}', [ SummaryController::class, 'place' ])->name('summary.place')->where([ 'type' => '(education)|(experience)' ]);
+        });
     });
 });
