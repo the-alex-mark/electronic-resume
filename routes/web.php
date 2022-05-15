@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::redirect('/', 'home');
+
 Route::get('/', function () {
     return view('pages.welcome');
 });
@@ -28,6 +30,8 @@ Auth::routes();
 Route::middleware([ 'auth' ])->group(function () {
 
     Route::middleware([ 'candidate' ])->group(function () {
+
+        // Раздел "Консоль"
         Route::get('home', [ HomeController::class, 'index' ])->name('home');
 
         // Раздел "Анкета"
