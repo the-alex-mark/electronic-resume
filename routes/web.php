@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CheckingController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PassageController;
 use App\Http\Controllers\SummaryController;
@@ -64,6 +65,14 @@ Route::middleware([ 'auth' ])->group(function () {
             // Вспомогательные маршруты
             Route::post('question', [ TestController::class, 'question' ])->name('test.question');
             Route::post('answer', [ TestController::class, 'answer' ])->name('test.answer');
+        });
+
+        // Раздел "Проверка результата"
+        Route::prefix('checking')->group(function () {
+
+            // Прохождение теста
+            Route::get('{result}/', [ CheckingController::class, 'check' ])->name('checking.check');
+            Route::post('save', [ CheckingController::class, 'save' ])->name('checking.save');
         });
     });
 });
