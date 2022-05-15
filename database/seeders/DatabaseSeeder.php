@@ -2,14 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Database\Guard;
 use App\Models\Position;
 use App\Models\Role;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder {
 
-    #region Roles
+    #region Data
 
     /**
      * Выполняет заполнение ролей пользователей.
@@ -53,6 +52,11 @@ class DatabaseSeeder extends Seeder {
             'slug'  => 'designer',
             'title' => 'Дизайнер'
         ]);
+
+        Position::query()->create([
+            'slug'  => 'it_analyst',
+            'title' => 'IT-Аналитик'
+        ]);
     }
 
     #endregion
@@ -63,11 +67,7 @@ class DatabaseSeeder extends Seeder {
      * @return void
      */
     public function run() {
-        Guard::unguard();
-
         $this->roles();
         $this->positions();
-
-        Guard::reguard();
     }
 }

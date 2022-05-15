@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use App\Database\Eloquent\Concerns\HasCustom;
+use App\Database\Eloquent\Concerns\HasOverrides;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * ...
@@ -16,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 class Role extends Model {
 
     use HasFactory;
-    use HasCustom;
+    use HasOverrides;
 
     #region Properties
 
@@ -37,6 +38,19 @@ class Role extends Model {
      * @inheritDoc
      */
     public $timestamps = false;
+
+    #endregion
+
+    #region Relationships
+
+    /**
+     * Возвращает список пользователей.
+     *
+     * @return HasMany
+     */
+    public function users() {
+        return $this->hasMany(User::class);
+    }
 
     #endregion
 }

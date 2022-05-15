@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use App\Database\Eloquent\Concerns\HasCustom;
+use App\Database\Eloquent\Concerns\HasOverrides;
 use App\Database\Eloquent\Concerns\HasValidation;
 use App\Rules\PhoneFormatRule;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
- * Представляет резюме.
+ * Представляет анкету.
  *
  * @property int $id Идентификатор записи
  * @property int $user_id Идентификатор записи пользователя
@@ -25,23 +26,28 @@ use Illuminate\Support\Carbon;
  * @property Carbon $date_of_birth Дата рождения
  * @property string $city Город проживания
  * @property string $floor Пол
- * @property string $phone Мобильный телефон
- * @property string $email Электронная почта
+ * @property string $phone Номер мобильного телефона
+ * @property string $email Адрес электронной почты
  * @property string $site Сайт
  * @property string $about Биография
  * @property Carbon $created_at Время создания записи
  * @property Carbon $updated_at Время обновления записи
- * @property-read string $initials Краткое ФИО (инициалы)
+ * @property-read string $full_name Полное Ф.И.О.
+ * @property-read string $initials Краткое Ф.И.О. (инициалы)
  * @property-read User $user Пользователь
  * @property-read Position $position Должность
+ * @property-read string $phone_masked Маскированный номер мобильного телефона
+ * @property-read string $email_masked Маскированный адрес электронной почты
  * @property-read Collection $educations Образование
  * @property-read Collection $experiences Опыт работы
  * @property-read Result $result Результат прохождения теста
+ *
+ * @method static Builder ofPosition($slug) Возвращает список анкет по указанной должности.
  */
 class Summary extends Model {
 
     use HasFactory;
-    use HasCustom;
+    use HasOverrides;
     use HasValidation;
 
     #region Properties
@@ -84,7 +90,7 @@ class Summary extends Model {
      * @return BelongsTo
      */
     public function user() {
-        return $this->belongsTo(Position::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
 
     /**
@@ -93,7 +99,7 @@ class Summary extends Model {
      * @return BelongsTo
      */
     public function position() {
-        return $this->belongsTo(Position::class, 'position_id');
+        return $this->belongsTo(Position::class);
     }
 
     /**
@@ -102,7 +108,7 @@ class Summary extends Model {
      * @return HasMany
      */
     public function educations() {
-        return $this->hasMany(Education::class, 'summary_id');
+        return $this->hasMany(Education::class);
     }
 
     /**
@@ -111,7 +117,7 @@ class Summary extends Model {
      * @return HasMany
      */
     public function experiences() {
-        return $this->hasMany(Experience::class, 'summary_id');
+        return $this->hasMany(Experience::class);
     }
 
     /**
@@ -120,7 +126,24 @@ class Summary extends Model {
      * @return HasOne
      */
     public function result() {
-        return $this->hasOne(Result::class, 'summary_id');
+        return $this->hasOne(Result::class);
+    }
+
+    #endregion
+
+    #region Scopes
+
+    /**
+     * Возвращает список анкет по указанной должности.
+     *
+     * @param  Builder $query Запрос.
+     * @param  string  $slug  Ярлык должности.
+     * @return Builder
+     */
+    public function scopeOfPosition(Builder $query, $slug) {
+        return $query
+            ->join('positions', 'positions.id', '=', 'position_id', null)
+            ->where('positions.slug', $slug);
     }
 
     #endregion
@@ -138,12 +161,31 @@ class Summary extends Model {
     }
 
     /**
+     * Возвращает полное ФИО.
+     *
+     * @return string
+     */
+    public function getFullNameAttribute() {
+        $name = ucfirst($this->last_name) . ' ' . ucfirst($this->first_name);
+
+        if (!empty($this->patronymic))
+            $name .= ' ' . ucfirst($this->patronymic);
+
+        return $name;
+    }
+
+    /**
      * Возвращает краткое ФИО (инициалы).
      *
      * @return string
      */
     public function getInitialsAttribute() {
-        return ucfirst($this->last_name) . mb_strtoupper(' ' . mb_substr($this->first_name, 0, 1) . '. ' . mb_substr($this->patronymic, 0, 1) . '.');
+        $name = ucfirst($this->last_name) . mb_strtoupper(' ' . mb_substr($this->first_name, 0, 1) . '.');
+
+        if (!empty($this->patronymic))
+            $name .= ' ' . mb_strtoupper(mb_substr($this->patronymic, 0, 1) . '.');
+
+        return $name;
     }
 
     /**
@@ -157,6 +199,44 @@ class Summary extends Model {
             return null;
 
         return Carbon::parse($value, 'UTC')->setTimezone(config('app.timezone'));
+    }
+
+    /**
+     * Задаёт номер мобильного телефона.
+     *
+     * @param  mixed $value Номер мобильного телефона.
+     * @return void
+     */
+    public function setPhoneAttribute($value) {
+        $this->attributes['phone'] = '8' . phone_cleared($value);
+    }
+
+    /**
+     * Возвращает номер мобильного телефона.
+     *
+     * @param  mixed $value Номер мобильного телефона.
+     * @return string
+     */
+    public function getPhoneAttribute($value) {
+        return phone_formatted($value);
+    }
+
+    /**
+     * Возвращает маскированный номер мобильного телефона.
+     *
+     * @return string
+     */
+    public function getPhoneMaskedAttribute() {
+        return phone_masked($this->phone);
+    }
+
+    /**
+     * Возвращает маскированный адрес электронной почты.
+     *
+     * @return string
+     */
+    public function getEmailMaskedAttribute() {
+        return email_masked($this->email);
     }
 
     /**

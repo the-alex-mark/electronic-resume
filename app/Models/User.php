@@ -2,13 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -20,12 +18,10 @@ use Laravel\Sanctum\HasApiTokens;
  * @property int $role_id Идентификатор записи роли
  * @property string $name Имя
  * @property string $email Адрес электронной почты
+ * @property-read Role $role Роль
  * @property-read Collection $summaries Анкеты
  *
  * @method static Builder ofRole($slug) Возвращает список пользователей по указанной роли.
- * @method static Builder departmentLeaders() Возвращает список руководителей отделов.
- * @method static Builder managers() Возвращает список кадровых менеджеров.
- * @method static Builder candidates() Возвращает список кандидатов.
  */
 class User extends Authenticatable {
 
@@ -70,7 +66,7 @@ class User extends Authenticatable {
      * @return BelongsTo
      */
     public function role() {
-        return $this->belongsTo(Role::class, 'role_id');
+        return $this->belongsTo(Role::class);
     }
 
     /**
@@ -99,35 +95,18 @@ class User extends Authenticatable {
             ->where('roles.slug', $slug);
     }
 
-    /**
-     * Возвращает список руководителей отделов.
-     *
-     * @param  Builder $query Запрос.
-     * @return Builder
-     */
-    public function scopeDepartmentLeaders(Builder $query) {
-        return $query->ofRole('head_of_department');
-    }
-
-    /**
-     * Возвращает список кадровых менеджеров.
-     *
-     * @param  Builder $query Запрос.
-     * @return Builder
-     */
-    public function scopeManagers(Builder $query) {
-        return $query->ofRole('hr');
-    }
-
-    /**
-     * Возвращает список кандидатов.
-     *
-     * @param  Builder $query Запрос.
-     * @return Builder
-     */
-    public function scopeCandidates(Builder $query) {
-        return $query->ofRole('candidate');
-    }
-
     #endregion
+
+    /**
+     * Определяет, принадлежит ли указанная роль пользователю.
+     *
+     * @param  array|string $slug Ярлык роли.
+     * @return bool
+     */
+    public function isRole($slug) {
+        if (is_string($slug))
+            return $this->role->slug === $slug;
+
+        return in_array($this->role->slug, $slug);
+    }
 }

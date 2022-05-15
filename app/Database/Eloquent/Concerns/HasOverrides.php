@@ -4,7 +4,10 @@ namespace App\Database\Eloquent\Concerns;
 
 use Illuminate\Support\Carbon;
 
-trait HasCustom {
+/**
+ * @property-read bool $json_pretty_print Определяет, требуется ли ...
+ */
+trait HasOverrides {
 
     #region DateTime
 

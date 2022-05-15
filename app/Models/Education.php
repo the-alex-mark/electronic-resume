@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Database\Eloquent\Concerns\HasCustom;
+use App\Database\Eloquent\Concerns\HasOverrides;
 use App\Database\Eloquent\Concerns\HasValidation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Education extends Model {
 
     use HasFactory;
-    use HasCustom;
+    use HasOverrides;
     use HasValidation;
 
     #region Properties

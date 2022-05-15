@@ -26,6 +26,7 @@ class CreateSummaryResultsTable extends Migration {
             $table->foreignId('summary_id')->nullable(false)->comment('Резюме');
             $table->longText('questions')->nullable(false)->comment('Вопросы');
             $table->longText('answers')->nullable()->comment('Ответы');
+            $table->timestamp('checked_at')->nullable()->comment('Дата проверки');
 
             // Добавление временных меток
             $table->timestamps();

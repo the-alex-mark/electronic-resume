@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Database\Eloquent\Concerns\HasCustom;
+use App\Database\Eloquent\Concerns\HasOverrides;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,7 +14,7 @@ use Illuminate\Support\Carbon;
  * @property int $id Идентификатор записи
  * @property int $position_id Идентификатор записи должности
  * @property string $title Название
- * @property string $data Параметры теста
+ * @property array $data Параметры теста
  * @property Carbon $created_at Время создания записи
  * @property Carbon $updated_at Время обновления записи
  * @property-read Position $position Должность
@@ -22,7 +22,7 @@ use Illuminate\Support\Carbon;
 class Test extends Model {
 
     use HasFactory;
-    use HasCustom;
+    use HasOverrides;
 
     #region Properties
 
