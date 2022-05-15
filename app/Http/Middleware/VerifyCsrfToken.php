@@ -2,16 +2,27 @@
 
 namespace App\Http\Middleware;
 
+use Closure;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
 
-class VerifyCsrfToken extends Middleware
-{
+class VerifyCsrfToken extends Middleware {
+
+    #region Properties
+
     /**
-     * The URIs that should be excluded from CSRF verification.
-     *
-     * @var array<int, string>
+     * @inerhitDoc
      */
-    protected $except = [
-        //
-    ];
+    protected $except = [];
+
+    #endregion
+
+    /**
+     * @inheritDoc
+     */
+    public function handle($request, Closure $next) {
+        if (config('app.verify_csrf', true) !== false)
+            return parent::handle($request, $next);
+
+        return $next($request);
+    }
 }
