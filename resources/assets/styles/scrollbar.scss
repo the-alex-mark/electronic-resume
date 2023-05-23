@@ -1,0 +1,35 @@
+::-webkit-scrollbar-button {
+    width: 4px;
+    height: 0;
+
+    background-repeat: no-repeat;
+}
+
+/* -- Цвет фона ScrollBar -- */
+::-webkit-scrollbar-track {
+    /* background-color: rgb(238, 243, 245); */
+    background-color: transparent
+}
+
+/* -- Цвет THUMB -- */
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 0;
+            border-radius: 5px;
+    background-color: #609FFD;
+
+    /* -- Цвет THUMB при наведении -- */
+    &:hover {
+        background-color: #609FFD;
+    }
+}
+
+::-webkit-resizer {
+    width: 4px;
+    height: 0;
+
+    background-repeat: no-repeat; }
+
+/* -- Ширина ScrollBar -- */
+::-webkit-scrollbar {
+    width: 8px;
+}
